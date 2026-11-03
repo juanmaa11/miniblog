@@ -75,3 +75,38 @@ revisión; después entra como `docente.demo` (o como administrador), revísala 
 
 > **Importante:** borra estos usuarios (en `/admin/users/`, como administrador) o cambia su contraseña
 > antes de publicar el blog en internet. Contraseñas conocidas en un servidor público son un riesgo.
+
+
+## Cómo he desplegado el proyecto
+
+### Entorno
+Debian 13 (trixie) con PHP 8.4, Git y Composer. Paquetes instalados:
+
+```
+sudo apt install git openssh-client php-cli php-sqlite3 php-xml php-mbstring php-intl php-curl unzip composer
+```
+
+### Pasos
+1. Hice fork de `mpgprofe/miniblog` y clone mi fork con SSH:
+
+```
+git clone git@github.com:juanmaa11/miniblog.git
+```
+
+2. Instalé y arranqué la aplicación:
+
+```
+composer install
+php bin/console create-schema
+php bin/console app:create-user admin "Administrador"
+php -S localhost:8000 -t public
+```
+
+3. Añadí `upstream` y sincronicé con `git remote add upstream`, `git fetch upstream` y `git merge upstream/master`.
+4. Creé la rama `add-license`, añadí la licencia y la envié con un pull request a mi propio fork.
+
+### Problemas que me surgieron
+- **`unknown key type ed255`:** escribí mal el tipo de clave en `ssh-keygen`; es `ed25519`.
+- **`Permission denied (publickey)`:** la clave pública no estaba bien añadida en GitHub; la copié de nuevo y funcionó.
+- **`duplicate column name: user_id` en `create-schema`:** la base de datos ya existía de un intento anterior; borré `var/schema.sqlite` y la volví a crear.
+- **`Conexión segura fallida` en el navegador:** Firefox usaba HTTPS, pero el servidor de PHP solo habla HTTP; entré con `http://localhost:8000`.
